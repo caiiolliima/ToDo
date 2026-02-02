@@ -1,0 +1,50 @@
+services:
+  auth-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_pass
+      POSTGRES_DB: auth_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+
+  tasks-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: tasks_user
+      POSTGRES_PASSWORD: tasks_pass
+      POSTGRES_DB: tasks_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - tasks-db-data:/var/lib/postgresql/data
+
+  auth-service:
+    build: ./services/auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://auth_user:auth_pass@auth-db:5432/auth_db
+      JWT_SECRET: your-jwt-secret-change-in-production
+    depends_on:
+      - auth-db
+
+  tasks-service:
+    build: ./services/tasks-service
+    ports:
+      - "3002:3002"
+    environment:
+      DATABASE_URL: postgresql://tasks_user:tasks_pass@tasks-db:5432/tasks_db
+      AUTH_SERVICE_URL: http://auth-service:3001
+    depends_on:
+      - tasks-db
+      - auth-service
+
+  # Frontend: run locally with `pnpm dev` from apps/frontend
+  # Or build and serve: docker build -t frontend ./apps/frontend
+
+volumes:
+  auth-db-data:
+  tasks-db-data:
