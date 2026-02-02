@@ -69,6 +69,4 @@ cd services/tasks-service && pnpm db:push && pnpm dev
 
 Copie `.env.example` para `.env` e ajuste conforme necessário.
 
-## Planos
 
-Consulte [.cursor/plans/00-master-plan.md](.cursor/plans/00-master-plan.md) para o plano mestre e sub-planos.
